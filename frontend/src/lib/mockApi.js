@@ -1,25 +1,68 @@
-import axios from 'axios'
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-})
+async function request(method, path, { body, params } = {}) {
+  const base = BASE.endsWith("/") ? BASE.slice(0, -1) : BASE;
+  const url = new URL(`${base}${path}`);
 
-// ITEMS
-api.getItems = () => api.get('/items').then(r => r.data)
-api.addItem = (data) => api.post('/items', data).then(r => r.data)
-console.log(api.addItem);
+  if (params) {
+    Object.keys(params).forEach((k) => {
+      if (params[k] !== undefined && params[k] !== null)
+        url.searchParams.append(k, params[k]);
+    });
+  }
 
-api.updateItem = (id, data) => api.put(`/items/${id}`, data).then(r => r.data)
+  const init = { method, headers: {} };
+  if (body !== undefined) {
+    init.headers["Content-Type"] = "application/json";
+    init.body = JSON.stringify(body);
+  }
 
-// CATEGORIES
-api.getCategories = () => api.get('/categories').then(r => r.data)
-api.addCategory = (name) => api.post('/categories', { name }).then(r => r.data)
-api.deleteCategory = (id) => api.delete(`/categories/${id}`)
+  const res = await fetch(url.toString(), init);
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (e) {
+    console.error(e);
+    data = text;
+  }
 
-// SALES
-api.getSales = () => api.get('/sales').then(r => r.data)
-api.getSalesRange = (start, end) => api.get('/sales/range', { params: { from: start, to: end } }).then(r => r.data)
-api.addSale = (data) => api.post('/sales', data).then(r => r.data)
+  if (!res.ok) {
+    const err = new Error((data && data.error) || res.statusText);
+    err.status = res.status;
+    err.response = data;
+    throw err;
+  }
 
-export default api
-export { api }
+  return data;
+}
+
+const api = {
+  // low-level helpers
+  get: (p, opts) => request("GET", p, opts),
+  post: (p, body) => request("POST", p, { body }),
+  put: (p, body) => request("PUT", p, { body }),
+  delete: (p) => request("DELETE", p),
+
+  // ITEMS
+  getItems: () => request("GET", "/items"),
+  addItem: (data) => request("POST", "/items", { body: data }),
+  updateItem: (id, data) => request("PUT", `/items/${id}`, { body: data }),
+
+  // CATEGORIES
+  getCategories: () => request("GET", "/categories"),
+  addCategory: (name) => request("POST", "/categories", { body: { name } }),
+  deleteCategory: (id) => request("DELETE", `/categories/${id}`),
+
+  // SALES
+  getSales: () => request("GET", "/sales"),
+  getSalesRange: (start, end) =>
+    request("GET", "/sales/range", { params: { from: start, to: end } }),
+  // legacy name used in some components
+  getSalesBetween: (start, end) =>
+    request("GET", "/sales/range", { params: { from: start, to: end } }),
+  addSale: (data) => request("POST", "/sales", { body: data }),
+};
+
+export default api;
+export { api };

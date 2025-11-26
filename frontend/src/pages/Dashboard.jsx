@@ -10,10 +10,10 @@ export default function Dashboard() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    // Sax: axios GET request
+    // Use API helper which returns parsed data
     api
-      .get("/items")
-      .then((response) => setItems(response.data))
+      .getItems()
+      .then((data) => setItems(data))
       .catch((error) => console.error("Failed to fetch items:", error));
   }, []);
 

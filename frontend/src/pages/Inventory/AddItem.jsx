@@ -6,25 +6,35 @@ export default function AddItem() {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
-  const [category, setCategory] = useState("Electronics");
+  const [category, setCategory] = useState("");
   const [cats, setCats] = useState([]);
   const nav = useNavigate();
 
   useEffect(() => {
-    api.getCategories().then(setCats);
+    api
+      .getCategories()
+      .then(setCats)
+      .catch((err) => {
+        console.error("Failed to load categories:", err);
+        setCats([]);
+      });
   }, []);
 
   const submit = async (e) => {
     e.preventDefault();
     console.log({ name, price, stock });
 
-    await api.addItem({
-      name,
-      price: Number(price),
-      stock: Number(stock),
-      category,
-    });
-    nav("/inventory");
+    try {
+      await api.addItem({
+        name,
+        price: Number(price),
+        stock: Number(stock),
+        categoryId: category || null,
+      });
+      nav("/inventory");
+    } catch (err) {
+      console.error("Failed to add item:", err);
+    }
   };
 
   return (
@@ -43,8 +53,9 @@ export default function AddItem() {
           onChange={(e) => setCategory(e.target.value)}
           className="w-full p-2 border rounded"
         >
+          <option value="">-- Select category --</option>
           {cats.map((c) => (
-            <option key={c._id} value={c.name}>
+            <option key={c._id} value={c._id}>
               {c.name}
             </option>
           ))}
