@@ -16,6 +16,8 @@ export default function AddItem() {
 
   const submit = async (e) => {
     e.preventDefault();
+    console.log({ name, price, stock });
+
     await api.addItem({
       name,
       price: Number(price),

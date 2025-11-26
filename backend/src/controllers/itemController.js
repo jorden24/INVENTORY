@@ -13,6 +13,7 @@ exports.getAll = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const { name, categoryId, stock = 100, price = 0 } = req.body
+    console.log(req.body);
     const item = await Item.create({ name, category: categoryId || null, stock, price })
     res.status(201).json(item)
   } catch (err) {
