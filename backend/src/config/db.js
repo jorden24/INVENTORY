@@ -8,7 +8,9 @@ const connectDB = async () => {
     console.log("MongoDB connected")
   } catch (err) {
     console.error("DB connection error:", err)
-    process.exit(1)
+    // Do NOT exit the process here. In development we want the server to remain up so
+    // frontend fetch/CORS issues can be diagnosed even if the DB is unavailable.
+    // If you want to fail fast in production, handle that via environment checks.
   }
 }
 

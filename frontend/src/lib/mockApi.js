@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:5002/api";
 
 async function request(method, path, { body, params } = {}) {
   const base = BASE.endsWith("/") ? BASE.slice(0, -1) : BASE;
@@ -62,6 +62,9 @@ const api = {
   getSalesBetween: (start, end) =>
     request("GET", "/sales/range", { params: { from: start, to: end } }),
   addSale: (data) => request("POST", "/sales", { body: data }),
+
+  // AUTH
+  login: (username, password) => request('POST', '/auth/login', { body: { username, password } }),
 };
 
 export default api;
