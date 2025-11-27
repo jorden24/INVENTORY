@@ -17,10 +17,12 @@ export default function Dashboard() {
       .catch((error) => console.error("Failed to fetch items:", error));
   }, []);
 
-  // Diyaarso pie chart data
+  // Prepare pie chart data - use category name when available
   const map = {};
   items.forEach((it) => {
-    map[it.category] = (map[it.category] || 0) + 1;
+    const catName =
+      (it.category && it.category.name) || it.category || "Uncategorized";
+    map[catName] = (map[catName] || 0) + 1;
   });
   const pieData = Object.keys(map).map((k) => ({ name: k, value: map[k] }));
 

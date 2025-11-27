@@ -57,7 +57,7 @@ export default function Reports() {
 
   const inventoryRows = items.map((i) => ({
     name: i.name,
-    category: i.category,
+    category: (i.category && i.category.name) || i.category || "",
     stock: i.stock,
     price: i.price,
   }));
