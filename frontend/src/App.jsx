@@ -14,10 +14,10 @@ import Login from "./pages/Login";
 
 export default function App() {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <main className="flex-1 p-6 overflow-auto">
-        <AuthProvider>
+    <AuthProvider>
+      <div className="flex h-screen">
+        <Sidebar />
+        <main className="flex-1 p-6 overflow-auto">
           <Routes>
             <Route
               path="/login"
@@ -94,8 +94,8 @@ export default function App() {
               }
             />
           </Routes>
-        </AuthProvider>
-      </main>
-    </div>
+        </main>
+      </div>
+    </AuthProvider>
   );
 }
